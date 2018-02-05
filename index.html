@@ -2,6 +2,7 @@
 <html>
 <script src="draw.js"></script>
 <script src="math2.js"></script>
+<script src="Button.js"></script>
 <head>
 	<title>
 		Balls!
@@ -10,11 +11,66 @@
 <body>
 	<canvas style="border: 2px dashed green" id="main"></canvas>
 	<script type="text/javascript">
-		const C = document.getElementById('main');
+		const MM = {
+			c: document.getElementById('main')
+		};
+		const D = new Draw(MM.c);
 		function init(){
-			C.width = window.innerWidth, C.height = window.innerHeight;
+			MM.c.width = window.innerWidth, MM.c.height = window.innerHeight;
+			MM.ww = MM.c.width, MM.hh = MM.c.height;
 		}
 		init();
+	</script>
+	<script src="Ball.js"></script>
+	<script type="text/javascript">
+		var sc = 0;
+		var bw = [];
+		function XX(event){
+			var e = event || window.event;
+			var mouseX = e.offsetX, mouseY = e.offsetY;
+			for (var i = bw.length - 1; i >= 0; i--) {
+				if(bw[i].in(mouseX,mouseY) && bw[i].f){
+					bw[i].f();
+				}
+			}
+		}
+		MM.c.onmousedown = XX;
+		function grid(sp){
+			for(var x=0;x<MM.ww;x+=sp){
+				D.line(x,0,x,MM.hh,"#AAAAAA",1);
+			}
+			for(var y=0;y<MM.hh;y+=sp){
+				D.line(0,y,MM.ww,y,"#AAAAAA",1);
+			}
+		}
+		var scs = [
+			{
+				bs: [
+					new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
+						sc = 1;
+						this.f = null;
+					})
+				],
+				run: function() {
+					for (var i = this.bs.length - 1; i >= 0; i--) {
+						this.bs[i].run();
+					}
+					D.strokeText("Balls!", MM.ww/2,MM.hh/4,"182px monospace","#0000FF");
+				}
+			},
+			{
+				run: function(){
+					D.fillRect(0,0,MM.ww,MM.hh,"#FF0000");
+				}
+			}
+		];
+		function run(){
+			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF");
+			grid(84);
+			scs[sc].run();
+			setTimeout(run, 10);
+		}
+		run();
 	</script>
 </body>
 </html>

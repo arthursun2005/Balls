@@ -140,6 +140,9 @@ Point2.prototype.normalize = function() {
 	this.y/=n;
 };
 // other
+Point2.sub = function(a,b){
+	return new Point2(a.x-b.x,a.y-b.y);
+};
 Point2.mag = function(p){
 	return mag2(p.x,p.y);
 };
@@ -147,10 +150,21 @@ Point2.normalize = function(p){
 	var n = Point2.mag(p);
 	return new Point(p.x/n,p.y/n);
 };
-Point3.copy = function(a,b){
+Point2.copy = function(a,b){
 	b.x = a.x;
 	b.y = a.y;
 };
 Point2.heading = function(p){
 	return Math.atan2(p.y,p.x);
+};
+Point2.rotateA = function(p,a,d) {
+	var r = new Point2();
+	var s = Math.sin(a), c = Math.cos(a);
+	if(d){
+		r.x = p.x*c+p.y*s;
+		r.y = p.y*c-p.x*s;
+	}else{
+		r.x = p.x*c-p.y*s;
+		r.y = p.y*c+p.x*s;
+	}
 };
