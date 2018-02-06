@@ -18,6 +18,7 @@
 		function init(){
 			MM.c.width = window.innerWidth, MM.c.height = window.innerHeight;
 			MM.ww = MM.c.width, MM.hh = MM.c.height;
+			MM.mx = 0, MM.my = 0;
 		}
 		init();
 	</script>
@@ -28,9 +29,6 @@
 		var bw = [];
 		var me = new Me();
 		me.p = new Point2(MM.ww/2,MM.hh/2);
-		function solveBalls(){
-			var all = [];
-		}
 		function XX(event){
 			var e = event || window.event;
 			var mouseX = e.offsetX, mouseY = e.offsetY;
@@ -45,34 +43,25 @@
 			for(var x=0;x<MM.ww;x+=sp){
 				D.line(x,0,x,MM.hh,"#AAAAAA",1);
 			}
-			for(var y=0;y<MM.hh;y+=sp){
+			for(var y=0;y<=MM.hh;y+=sp){
 				D.line(0,y,MM.ww,y,"#AAAAAA",1);
 			}
 		}
-		var scs = [
-			{
-				bs: [
-					new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
-						sc = 1;
-						this.f = null;
-					})
-				],
-				run: function() {
-					for (var i = this.bs.length - 1; i >= 0; i--) {
-						this.bs[i].run();
-					}
-					D.strokeText("Balls!", MM.ww/2,MM.hh/4,"182px monospace","#0000FF");
-				}
-			},
-			{
-				run: function(){
-				}
-			}
-		];
+		var playButt = new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
+			sc = 1;
+			this.f = null;
+		});
 		function run(){
 			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF");
 			grid(84);
-			scs[sc].run();
+			if(sc == 0){
+				playButt.run();
+				D.strokeText("Balls!", MM.ww/2,MM.hh/4,"182px monospace","#0000FF");
+			}else if(sc == 1){
+				me.a+=0.05;
+				me.update();
+				me.draw();
+			}
 			setTimeout(run, 10);
 		}
 		run();

@@ -14,7 +14,7 @@ Button.prototype.draw = function() {
 	var px = this.p.x, py = this.p.y;
 	var x = px-this.d.x/2, y = py-this.d.y/2;
 	D.roundRect(x,y,this.d.x,this.d.y,10,this.c);
-	D.fillText(this.t,px,py+this.s/4,this.s+"px monospace",this.tc)
+	D.fillText(this.t,px,py+this.s/4,this.s+"px monospace",this.tc);
 };
 Button.prototype.in = function(x,y) {
 	return x>this.p.x-this.d.x && x<this.p.x+this.d.x && y>this.p.y-this.d.y && y<this.p.y+this.d.y;

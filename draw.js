@@ -5,9 +5,9 @@ Draw.prototype.line = function(x1, y1, x2, y2, c, t) {
 	var d = this.space.getContext("2d");
 	d.beginPath(); 
 	d.lineWidth = t;
+	d.strokeStyle = c;
 	d.moveTo(x1, y1);
 	d.lineTo(x2, y2);
-	d.strokeStyle = c;
 	d.stroke();
 };
 Draw.prototype.rect = function(x, y, w, h, c1, c2) {

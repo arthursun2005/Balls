@@ -13,8 +13,16 @@ function Ball(x,y,r,m){
 	this.m = m || this.r*this.r;
 	this.c = "#FF0000";
 }
+Ball.prototype.solveLineSegment = function(p1,p2){
+};
 Ball.prototype.draw = function() {
-	D.arc(this.p.x,this.p.y,this.r,0,2*Math.PI,this.c);
+	var d = MM.c.getContext("2d");
+	d.beginPath();
+	d.translate(this.p.x+MM.mx,this.p.y+MM.my);
+	d.strokeStyle = this.c;
+	d.arc(this.p.x,this.p.y,0,2*Math.PI);
+	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
+	d.stroke();
 };
 Ball.prototype.update = function() {
 	this.p.add(this.v);
@@ -58,4 +66,20 @@ Ball.prototype.each = function(other) {
 	this.p.add(pfinal[0]);
 	this.v = Point2.rotateA(vfinal[0],a,false);
 	other.v = Point2.rotateA(vfinal[1],a,false);
+};
+var Balls = {
+	getMaxRadius: function(bs){
+		if(bs.length<1){
+			return null;
+		}else{
+			var R = bs[0].r;
+			for (var i = bs.length - 1; i >= 1; i--) {
+				if(bs[i].r>R) R = bs[i].r;
+			}
+			return R;
+		}
+	},
+	solve: function(bs){
+		var all = [], maxRadius = this.getMaxRadius(bs);
+	}
 };
