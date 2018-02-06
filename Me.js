@@ -1,7 +1,7 @@
 function Me(){
 	this.p = new Point2();
 	this.v = new Point2();
-	this.d = 50;
+	this.d = 48;
 	this.a = 0;
 	this.c = "#888800";
 }

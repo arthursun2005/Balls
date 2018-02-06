@@ -13,7 +13,7 @@ function decimalTo(n,t){
 			return "";
 		}
 		a+=r;
-		bn = Math.floor(bn/16);
+		bn = Math.floor(bn/t);
 	}
 	a = flipString(a);
 	return a;
@@ -60,17 +60,17 @@ Point3.prototype.div = function(p) {
 	this.y/=p;
 	this.z/=p;
 };
-Point3.prototype.floor = function(p) {
+Point3.prototype.floor = function() {
 	this.x = Math.floor(this.x);
 	this.y = Math.floor(this.y);
 	this.z = Math.floor(this.z);
 };
-Point3.prototype.round = function(p) {
+Point3.prototype.round = function() {
 	this.x = Math.round(this.x);
 	this.y = Math.round(this.y);
 	this.z = Math.round(this.z);
 };
-Point3.prototype.ceil = function(p) {
+Point3.prototype.ceil = function() {
 	this.x = Math.ceil(this.x);
 	this.y = Math.ceil(this.y);
 	this.z = Math.ceil(this.z);
@@ -119,15 +119,15 @@ Point2.prototype.div = function(p) {
 	this.x/=p;
 	this.y/=p;
 };
-Point2.prototype.floor = function(p) {
+Point2.prototype.floor = function() {
 	this.x = Math.floor(this.x);
 	this.y = Math.floor(this.y);
 };
-Point2.prototype.round = function(p) {
+Point2.prototype.round = function() {
 	this.x = Math.round(this.x);
 	this.y = Math.round(this.y);
 };
-Point2.prototype.ceil = function(p) {
+Point2.prototype.ceil = function() {
 	this.x = Math.ceil(this.x);
 	this.y = Math.ceil(this.y);
 };
@@ -143,12 +143,15 @@ Point2.prototype.normalize = function() {
 Point2.sub = function(a,b){
 	return new Point2(a.x-b.x,a.y-b.y);
 };
+Point2.mult = function(a,b){
+	return new Point2(a.x*b,a.y*b);
+};
 Point2.mag = function(p){
 	return mag2(p.x,p.y);
 };
 Point2.normalize = function(p){
 	var n = Point2.mag(p);
-	return new Point(p.x/n,p.y/n);
+	return new Point2(p.x/n,p.y/n);
 };
 Point2.copy = function(a,b){
 	b.x = a.x;
@@ -167,4 +170,5 @@ Point2.rotateA = function(p,a,d) {
 		r.x = p.x*c-p.y*s;
 		r.y = p.y*c+p.x*s;
 	}
+	return r;
 };

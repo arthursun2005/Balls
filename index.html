@@ -25,6 +25,8 @@
 	<script src="Ball.js"></script>
 	<script src="Me.js"></script>
 	<script type="text/javascript">
+		var startTime = Date.now();
+		var dtime;
 		var sc = 0;
 		var bw = [];
 		var me = new Me();
@@ -39,6 +41,32 @@
 			}
 		}
 		MM.c.onmousedown = XX;
+		var tDead = false, pDead = false;
+		var maxHealth = 1000;
+		var health = maxHealth;
+		var healthColor;
+		function healthBar(){
+			var bit1 = decimalTo(Math.round((maxHealth-health)/1000*255/1.5),16);
+			var bit2 = decimalTo(Math.round(health/1000*255),16);
+			var bit3 = decimalTo(Math.round(health/1000*255/5),16);
+			for(var i=0;i<2-bit1.length;i++){bit1 = "0"+bit1;}
+			if(bit1.length<2){bit1 = "0"+bit1;}
+
+			for(var i=0;i<2-bit2.length;i++){bit2 = "0"+bit2;}
+			for(var i=0;i<2-bit3.length;i++){bit3 = "0"+bit3;}
+			healthColor = "#"+bit1+bit2+bit3;
+
+			D.fillRect(MM.ww/4, 10, MM.ww/2*health/maxHealth, 25, healthColor);
+
+			var d = MM.c.getContext("2d");
+			d.beginPath();
+			d.lineWidth = 1;
+			d.strokeStyle = "#000000";
+			d.rect(MM.ww/4, 10, MM.ww/2, 25);
+			d.stroke();
+
+			D.fillText(health+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#000000");
+		}
 		function grid(sp){
 			for(var x=0;x<MM.ww;x+=sp){
 				D.line(x,0,x,MM.hh,"#AAAAAA",1);
@@ -50,17 +78,41 @@
 		var playButt = new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
 			sc = 1;
 			this.f = null;
+			sc0Balls = [];
 		});
+		var sc0Balls = [];
+		for(var i=0;i<6;i++){
+			var b = new Ball(random(0,MM.ww),random(0,MM.hh),random(10,40));
+			b.v = new Point2(random(-1,1),random(-1,1));
+			sc0Balls.push(b);
+		}
+		var d1 = 0, dt1 = 40;
 		function run(){
+			dtime = startTime-Date.now();
 			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF");
 			grid(84);
 			if(sc == 0){
 				playButt.run();
-				D.strokeText("Balls!", MM.ww/2,MM.hh/4,"182px monospace","#0000FF");
+				D.strokeText("Balls!", MM.ww/2,MM.hh/4,Math.min(MM.ww,MM.hh)/4+"px monospace","#0000FF");
+				for (var i = sc0Balls.length - 1; i >= 0; i--) {
+					sc0Balls[i].edge();
+					sc0Balls[i].update();
+				}
+				for (var i = sc0Balls.length - 1; i >= 0; i--) {
+					sc0Balls[i].draw();
+				}
+				Balls.solve(sc0Balls);
+				if(d1 == 0 && sc0Balls.length<50){
+					var b = new Ball(50,50,random(15,36));
+					b.v = new Point2(random(1,2),random(1,2));
+					sc0Balls.push(b);
+				}
+				d1 = (d1+1)%dt1;
 			}else if(sc == 1){
-				me.a+=0.05;
+				me.a+=0.04;
 				me.update();
 				me.draw();
+				healthBar();
 			}
 			setTimeout(run, 10);
 		}
