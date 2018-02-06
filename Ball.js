@@ -19,6 +19,20 @@ Ball.prototype.draw = function() {
 Ball.prototype.update = function() {
 	this.p.add(this.v);
 };
+Ball.prototype.edge = function() {
+	if(this.p.x<this.r && this.v.x<0){
+		this.v.x*=-1;
+	}
+	if(this.p.x>MM.ww-this.r && this.v.x>0){
+		this.v.x*=-1;
+	}
+	if(this.p.y<this.r && this.v.y<0){
+		this.v.y*=-1;
+	}
+	if(this.p.x>MM.hh-this.r && this.v.x>0){
+		this.v.y*=-1;
+	}
+};
 Ball.prototype.each = function(other) {
 	var d = Point2.sub(other.p,this.p);
 	var n = Point2.normalize(d);
@@ -39,4 +53,9 @@ Ball.prototype.each = function(other) {
 	ptemp[1].x+=vfinal[1].x;
 	pfinal[0] = Point2.rotateA(ptemp[0],a,false);
 	pfinal[1] = Point2.rotateA(ptemp[1],a,false);
+	other.p.x = this.p.x+pfinal[1].x;
+	other.p.y = this.p.y+pfinal[1].y;
+	this.p.add(pfinal[0]);
+	this.v = Point2.rotateA(vfinal[0],a,false);
+	other.v = Point2.rotateA(vfinal[1],a,false);
 };

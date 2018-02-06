@@ -22,9 +22,15 @@
 		init();
 	</script>
 	<script src="Ball.js"></script>
+	<script src="Me.js"></script>
 	<script type="text/javascript">
 		var sc = 0;
 		var bw = [];
+		var me = new Me();
+		me.p = new Point2(MM.ww/2,MM.hh/2);
+		function solveBalls(){
+			var all = [];
+		}
 		function XX(event){
 			var e = event || window.event;
 			var mouseX = e.offsetX, mouseY = e.offsetY;
@@ -60,7 +66,6 @@
 			},
 			{
 				run: function(){
-					D.fillRect(0,0,MM.ww,MM.hh,"#FF0000");
 				}
 			}
 		];
