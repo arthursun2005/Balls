@@ -11,7 +11,7 @@ function Ball(x,y,r,m){
 	this.v = new Point2();
 	this.r = r;
 	this.m = m || this.r*this.r;
-	this.c = "#FF6600";
+	this.c = "#DD6600";
 }
 Ball.prototype.solveLineSegment = function(p1,p2){
 };
@@ -19,11 +19,13 @@ Ball.prototype.draw = function() {
 	var d = MM.c.getContext("2d");
 	d.beginPath();
 	d.translate(this.p.x+MM.mx,this.p.y+MM.my);
-	d.strokeStyle = this.c;
-	d.lineWidth = 2;
+	d.strokeStyle = "#FF0000";
+	d.fillStyle = this.c;
+	d.lineWidth = 4;
 	d.arc(0,0,this.r,0,2*Math.PI);
 	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
 	d.stroke();
+	d.fill();
 };
 Ball.prototype.update = function() {
 	this.p.add(this.v);
@@ -41,6 +43,21 @@ Ball.prototype.edge = function() {
 	if(this.p.y>MM.hh-this.r && this.v.y>0){
 		this.v.y*=-1;
 	}
+};
+Ball.prototype.edge2 = function() {
+	if(this.p.x<this.r-size && this.v.x<0){
+		this.v.x*=-1;
+	}
+	if(this.p.x>size-this.r && this.v.x>0){
+		this.v.x*=-1;
+	}
+	if(this.p.y<this.r-size && this.v.y<0){
+		this.v.y*=-1;
+	}
+	if(this.p.y>size-this.r && this.v.y>0){
+		this.v.y*=-1;
+	}
+	this.p.x = constrain(this.p.x,-size,size);
 };
 Ball.prototype.each = function(other) {
 	var d = Point2.sub(other.p,this.p);

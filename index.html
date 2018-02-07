@@ -30,6 +30,7 @@
 	<script src="Ball.js"></script>
 	<script src="Me.js"></script>
 	<script type="text/javascript">
+		var size = 1e4;
 		var startTime = Date.now();
 		var dtime;
 		var sc = 0;
@@ -96,26 +97,45 @@
 			D.fillText(health+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#000000");
 		}
 		function grid(sp){
-			for(var x=0;x<MM.ww;x+=sp){
-				D.line(x,0,x,MM.hh,"#AAAAAA",1);
-			}
-			for(var y=0;y<=MM.hh;y+=sp){
-				D.line(0,y,MM.ww,y,"#AAAAAA",1);
+			var d = MM.c.getContext("2d");
+			for(var xy=-size;xy<size;xy+=sp){
+				if(xy+MM.mx<MM.ww && xy+MM.mx>0){
+					d.beginPath();
+					d.lineWidth = 1;
+					d.strokeStyle = "#AAAAAA";
+					d.moveTo(xy+MM.mx, -size+MM.my);
+					d.lineTo(xy+MM.mx, size+MM.my);
+					d.stroke();
+				}
+				if(xy+MM.my<MM.hh && xy+MM.my>0){
+					d.beginPath();
+					d.lineWidth = 1;
+					d.strokeStyle = "#AAAAAA";
+					d.moveTo(-size+MM.mx, xy+MM.my);
+					d.lineTo(size+MM.mx, xy+MM.my);
+					d.stroke();
+				}
 			}
 		}
+		var sc0Balls = [];
+		var mainBalls = [];
 		var playButt = new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
 			sc = 1;
 			this.f = null;
 			sc0Balls = [];
+			for(var i=0;i<1000;i++){
+				var b = new Ball(random(-size,size),random(-size,size),random(50,120));
+				b.v = new Point2(random(-1,1),random(-1,1));
+				if(Point2.mag(Point2.sub(b.p,me.p))>500) mainBalls.push(b);
+			}
 		});
-		var sc0Balls = [];
-		var mainBalls = [];
 		for(var i=0;i<6;i++){
 			var b = new Ball(random(0,MM.ww),random(0,MM.hh),random(10,40));
 			b.v = new Point2(random(-1,1),random(-1,1));
 			sc0Balls.push(b);
 		}
 		var d1 = 0, dt1 = 40;
+		var ox = false, oy = false;
 		function run(){
 			if(Point2.mag(me.v)>maxSpeed){
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
@@ -147,6 +167,7 @@
 				me.v.mult(0.982);
 				Balls.solve(mainBalls);
 				for (var i = mainBalls.length - 1; i >= 0; i--) {
+					mainBalls[i].edge2();
 					mainBalls[i].update();
 				}
 				for (var i = mainBalls.length - 1; i >= 0; i--) {
@@ -184,6 +205,39 @@
 					var n = Point2.normalize(Point2.sub(last,new Point2(me.p.x+MM.mx,me.p.y+MM.my)));
 					me.v.add(Point2.mult(n,sp));
 				}
+
+				var l1 = 6, l2 = 10;
+				var d = Point2.sub(new Point2(MM.ww/2,MM.hh/2),new Point2(me.p.x+MM.mx,me.p.y+MM.my));
+				var m = Point2.mag(d);
+				if(ox && me.p.x+MM.mx<MM.ww/2 && last.x>me.p.x+MM.mx){
+					ox = false;
+				}
+				if(ox && me.p.x+MM.mx>MM.ww/2 && last.x<me.p.x+MM.mx){
+					ox = false;
+				}
+
+				if(oy && me.p.y+MM.my<MM.hh/2 && last.y>me.p.y+MM.my){
+					oy = false;
+				}
+				if(oy && me.p.y+MM.my>MM.hh/2 && last.y<me.p.y+MM.my){
+					oy = false;
+				}
+				if(ox){
+					var t = map(Math.abs(me.p.x+MM.mx-MM.ww/2),MM.ww/l2,MM.ww/l1,0,1);
+					MM.mx-=me.v.x*t;
+				}
+				if(oy){
+					var t = map(Math.abs(me.p.y+MM.my-MM.hh/2),MM.hh/l2,MM.hh/l1,0,1);
+					MM.my-=me.v.y*t;
+				}
+				if(Math.abs(me.p.x+MM.mx-MM.ww/2)>MM.ww/l2){
+					ox = true;
+				}
+				if(Math.abs(me.p.y+MM.my-MM.hh/2)>MM.hh/l2){
+					oy = true;
+				}
+				me.p.x = constrain(me.p.x,-size,size);
+				me.p.y = constrain(me.p.y,-size,size);
 			}
 			setTimeout(run, 10);
 		}

@@ -18,6 +18,17 @@ function decimalTo(n,t){
 	a = flipString(a);
 	return a;
 }
+/* 
+	maths!
+*/
+function constrain(value, min, max){
+	if(value<=min) return min;
+	if(value>=max) return max;
+	else return value;
+}
+function map(value, l1, h1, l2, h2) {
+    return l2+(h2-l2)*(value-l1)/(h1-l1);
+}
 function dist2(x1,y1,x2,y2){
 	return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
 }
