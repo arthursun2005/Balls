@@ -143,8 +143,14 @@ Point2.prototype.normalize = function() {
 Point2.sub = function(a,b){
 	return new Point2(a.x-b.x,a.y-b.y);
 };
+Point2.add = function(a,b){
+	return new Point2(a.x+b.x,a.y+b.y);
+};
 Point2.mult = function(a,b){
 	return new Point2(a.x*b,a.y*b);
+};
+Point2.div = function(a,b){
+	return new Point2(a.x/b,a.y/b);
 };
 Point2.mag = function(p){
 	return mag2(p.x,p.y);

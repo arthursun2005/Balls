@@ -4,6 +4,7 @@ function Me(){
 	this.d = 48;
 	this.a = 0;
 	this.c = "#888800";
+	this.hit = false;
 }
 Me.prototype.draw = function() {
 	var d = MM.c.getContext("2d");
@@ -13,7 +14,11 @@ Me.prototype.draw = function() {
 	d.rect(-this.d/2,-this.d/2,this.d,this.d);
 	d.rotate(-this.a);
 	d.strokeStyle = this.c;
-	d.lineWidth = 3;
+	d.lineWidth = 2.5;
+	if(this.hit){
+		d.strokeStyle = "#FF0000";
+		d.lineWidth = 4;
+	}
 	d.stroke();
 	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
 };
