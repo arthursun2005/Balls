@@ -150,6 +150,16 @@ Point2.prototype.normalize = function() {
 	this.x/=n;
 	this.y/=n;
 };
+Point2.prototype.rotateA = function(a,d) {
+	var s = Math.sin(a), c = Math.cos(a);
+	if(d){
+		this.x = this.x*c+this.y*s;
+		this.y = this.y*c-this.x*s;
+	}else{
+		this.x = this.x*c-this.y*s;
+		this.y = this.y*c+this.x*s;
+	}
+};
 // other
 Point2.sub = function(a,b){
 	return new Point2(a.x-b.x,a.y-b.y);

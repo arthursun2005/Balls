@@ -13,15 +13,47 @@ Me.prototype.draw = function() {
 	d.rotate(this.a);
 	d.rect(-this.d/2,-this.d/2,this.d,this.d);
 	d.rotate(-this.a);
+	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
 	d.strokeStyle = this.c;
 	d.lineWidth = 2.5;
 	if(this.hit){
 		d.strokeStyle = "#FF0000";
-		d.lineWidth = 4;
+		d.lineWidth = 6;
 	}
 	d.stroke();
-	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
 };
 Me.prototype.update = function() {
 	this.p.add(this.v);
+};
+Me.prototype.cl1 = function(ball) {
+	this.lines = [
+		[new Point2(-this.d/2,-this.d/2),new Point2(this.d/2,-this.d/2)],
+		[new Point2(-this.d/2,-this.d/2),new Point2(-this.d/2,this.d/2)],
+		[new Point2(this.d/2,-this.d/2),new Point2(this.d/2,this.d/2)],
+		[new Point2(-this.d/2,this.d/2),new Point2(this.d/2,this.d/2)]
+	];
+	for (var i = this.lines.length - 1; i >= 0; i--) {
+		this.lines[i][0].rotateA(this.a,false);
+		this.lines[i][1].rotateA(this.a,false);
+	}
+	for (var i = this.lines.length - 1; i >= 0; i--) {
+		this.lines[i][0].add(this.p);
+		this.lines[i][1].add(this.p);
+	}
+	var dx = 0, dy = 0;
+	for (var i = this.lines.length - 1; i >= 0; i--) {
+		if(cl1(
+			this.lines[i][0].x+dx,
+			this.lines[i][0].y+dy,
+			this.lines[i][1].x+dx,
+			this.lines[i][1].y+dy,
+			ball.p.x+dx,
+			ball.p.y+dy,
+			ball.r
+			)){
+			var energy = Point2.mag(ball.v)*Point2.mag(ball.v)*ball.m+Point2.mag(this.v)*Point2.mag(this.v)*20;
+			return [true,energy];
+		}
+	}
+	return [false,null];
 };

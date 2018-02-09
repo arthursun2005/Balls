@@ -8,6 +8,7 @@
 <script src="draw.js"></script>
 <script src="math2.js"></script>
 <script src="Button.js"></script>
+<script src="collision.js"></script>
 <head>
 	<title>
 		Balls!
@@ -35,19 +36,19 @@
 		var dtime;
 		var sc = 0;
 		var bw = [];
-		var controls1 = "mouse";
+		var controls1;
 		var me = new Me();
 		me.p = new Point2(MM.ww/2,MM.hh/2);
 		var last = new Point2();
 		function rm(event){
 			var e = event || window.event;
 			var mouseX = e.offsetX, mouseY = e.offsetY;
+			last.x = mouseX, last.y = mouseY;
 			for (var i = bw.length - 1; i >= 0; i--) {
 				if(bw[i].in(mouseX,mouseY) && bw[i].f){
 					bw[i].f();
 				}
 			}
-			last.x = mouseX, last.y = mouseY;
 		}
 		MM.c.onmousedown = rm;
 		function rm2(event){
@@ -69,7 +70,7 @@
 			var x = e.keyCode;
 			keys[x] = false;
 		}
-		var maxSpeed = 4;
+		var maxSpeed = 6;
 		var tDead = false, pDead = false;
 		var maxHealth = 1000;
 		var health = maxHealth;
@@ -98,11 +99,11 @@
 		}
 		function grid(sp){
 			var d = MM.c.getContext("2d");
-			for(var xy=-size;xy<size;xy+=sp){
+			for(var xy=-size;xy<=size;xy+=sp){
 				if(xy+MM.mx<MM.ww && xy+MM.mx>0){
 					d.beginPath();
 					d.lineWidth = 1;
-					d.strokeStyle = "#AAAAAA";
+					d.strokeStyle = "#00000011";
 					d.moveTo(xy+MM.mx, -size+MM.my);
 					d.lineTo(xy+MM.mx, size+MM.my);
 					d.stroke();
@@ -110,7 +111,7 @@
 				if(xy+MM.my<MM.hh && xy+MM.my>0){
 					d.beginPath();
 					d.lineWidth = 1;
-					d.strokeStyle = "#AAAAAA";
+					d.strokeStyle = "#00000011";
 					d.moveTo(-size+MM.mx, xy+MM.my);
 					d.lineTo(size+MM.mx, xy+MM.my);
 					d.stroke();
@@ -120,19 +121,53 @@
 		var sc0Balls = [];
 		var mainBalls = [];
 		var playButt = new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
-			sc = 1;
-			this.f = null;
+			if(sc != 0) return;
+			sc = 2;
 			sc0Balls = [];
 			for(var i=0;i<1000;i++){
-				var b = new Ball(random(-size,size),random(-size,size),random(50,120));
-				b.v = new Point2(random(-1,1),random(-1,1));
+				var b = new Ball(random(-size,size),random(-size,size),random(50,220));
+				b.v = new Point2(random(-2,2),random(-2,2));
 				if(Point2.mag(Point2.sub(b.p,me.p))>500) mainBalls.push(b);
 			}
 		});
+		var sc2Butts = [
+			new Button(MM.ww/4,MM.hh/2,MM.ww/3.5,MM.hh/4,"Keys",function(){
+				if(sc != 2) return;
+				sc = 1;
+				controls1 = "keys";
+			}),
+			new Button(MM.ww/4*3,MM.hh/2,MM.ww/3.5,MM.hh/4,"Mouse",function(){
+				if(sc != 2) return;
+				sc = 1;
+				controls1 = "mouse";
+			})
+		];
 		for(var i=0;i<6;i++){
 			var b = new Ball(random(0,MM.ww),random(0,MM.hh),random(10,40));
 			b.v = new Point2(random(-1,1),random(-1,1));
 			sc0Balls.push(b);
+		}
+		function drawMiniMap(){
+			var ss = Math.min(MM.ww,MM.hh)/5;
+			var scl = ss/size/2;
+			D.rect(10,10,ss,ss,"#FFFFFF");
+			var r = scl*me.d;
+			var d = MM.c.getContext("2d");
+			d.beginPath();
+			d.translate(10+ss/2+me.p.x*scl,10+ss/2+me.p.y*scl);
+			d.scale(scl,scl);
+			d.rotate(me.a);
+			d.rect(-me.d/2,-me.d/2,me.d,me.d);
+			d.rotate(-me.a);
+			d.scale(1/scl,1/scl);
+			d.translate(-(10+ss/2+me.p.x*scl),-(10+ss/2+me.p.y*scl));
+			d.strokeStyle = me.c;
+			d.lineWidth = 2.5*scl;
+			if(me.hit){
+				d.strokeStyle = "#FF0000";
+				d.lineWidth = 6*scl;
+			}
+			d.stroke();
 		}
 		var d1 = 0, dt1 = 40;
 		var ox = false, oy = false;
@@ -141,8 +176,7 @@
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
 			}
 			dtime = startTime-Date.now();
-			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF");
-			grid(84);
+			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF80");
 			if(sc == 0){
 				playButt.run();
 				D.strokeText("Balls!", MM.ww/2,MM.hh/4,Math.min(MM.ww,MM.hh)/4+"px monospace","#0000FF");
@@ -155,16 +189,29 @@
 				}
 				Balls.solve(sc0Balls);
 				if(d1 == 0 && sc0Balls.length<50){
-					var b = new Ball(50,50,random(15,36));
+					var b = new Ball(-50,-50,random(15,36));
 					b.v = new Point2(random(1,2),random(1,2));
 					sc0Balls.push(b);
 				}
 				d1 = (d1+1)%dt1;
 			}else if(sc == 1){
+				grid(50);
 				me.a+=0.04;
 				me.update();
 				me.draw();
-				me.v.mult(0.982);
+				me.v.mult(0.9);
+
+				var hit = 0;
+				for (var j = mainBalls.length - 1; j >= 0; j--) {
+					var m = me.cl1(mainBalls[j]);
+					if(m[0]){
+						health-=Math.round(m[1]/6000);
+						hit++;
+					}
+				}
+				if(hit<=0){me.hit = false;}
+				else{me.hit = true;}
+
 				Balls.solve(mainBalls);
 				for (var i = mainBalls.length - 1; i >= 0; i--) {
 					mainBalls[i].edge2();
@@ -209,17 +256,23 @@
 				var l1 = 6, l2 = 10;
 				var d = Point2.sub(new Point2(MM.ww/2,MM.hh/2),new Point2(me.p.x+MM.mx,me.p.y+MM.my));
 				var m = Point2.mag(d);
-				if(ox && me.p.x+MM.mx<MM.ww/2 && last.x>me.p.x+MM.mx){
+				var mm = controls1 == "mouse";
+				var kk = !mm;
+				var k1 = keys[37] || keys[65];
+				var k2 = keys[38] || keys[87];
+				var k3 = keys[39] || keys[68];
+				var k4 = keys[40] || keys[83];
+				if(ox && me.p.x+MM.mx<MM.ww/2 && ((last.x>me.p.x+MM.mx && mm) || k3)){
 					ox = false;
 				}
-				if(ox && me.p.x+MM.mx>MM.ww/2 && last.x<me.p.x+MM.mx){
+				if(ox && me.p.x+MM.mx>MM.ww/2 && ((last.x<me.p.x+MM.mx && mm) || k1)){
 					ox = false;
 				}
 
-				if(oy && me.p.y+MM.my<MM.hh/2 && last.y>me.p.y+MM.my){
+				if(oy && me.p.y+MM.my<MM.hh/2 && ((last.y>me.p.y+MM.my && mm) || k4)){
 					oy = false;
 				}
-				if(oy && me.p.y+MM.my>MM.hh/2 && last.y<me.p.y+MM.my){
+				if(oy && me.p.y+MM.my>MM.hh/2 && ((last.y<me.p.y+MM.my && mm) || k2)){
 					oy = false;
 				}
 				if(ox){
@@ -238,6 +291,13 @@
 				}
 				me.p.x = constrain(me.p.x,-size,size);
 				me.p.y = constrain(me.p.y,-size,size);
+
+				drawMiniMap();
+			}else if(sc == 2){
+				D.fillText("Choose your control type: ", MM.ww/2,MM.hh/4,Math.min(MM.ww,MM.hh)/12+"px monospace","#9900FF");
+				for (var i = sc2Butts.length - 1; i >= 0; i--) {
+					sc2Butts[i].run();
+				}
 			}
 			setTimeout(run, 10);
 		}

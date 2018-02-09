@@ -11,7 +11,7 @@ function Ball(x,y,r,m){
 	this.v = new Point2();
 	this.r = r;
 	this.m = m || this.r*this.r;
-	this.c = "#DD6600";
+	this.c = "#DD660010";
 }
 Ball.prototype.solveLineSegment = function(p1,p2){
 };
@@ -19,9 +19,9 @@ Ball.prototype.draw = function() {
 	var d = MM.c.getContext("2d");
 	d.beginPath();
 	d.translate(this.p.x+MM.mx,this.p.y+MM.my);
-	d.strokeStyle = "#FF0000";
+	d.strokeStyle = "#FF000077";
 	d.fillStyle = this.c;
-	d.lineWidth = 4;
+	d.lineWidth = 2;
 	d.arc(0,0,this.r,0,2*Math.PI);
 	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
 	d.stroke();
@@ -57,7 +57,6 @@ Ball.prototype.edge2 = function() {
 	if(this.p.y>size-this.r && this.v.y>0){
 		this.v.y*=-1;
 	}
-	this.p.x = constrain(this.p.x,-size,size);
 };
 Ball.prototype.each = function(other) {
 	var d = Point2.sub(other.p,this.p);
@@ -137,6 +136,65 @@ var Balls = {
 						var d = Point2.sub(b2.p,b.p);
 						var m = Point2.mag(d);
 						b.each(b2);
+					}
+				}
+			}
+		}
+		this.all = all;
+	},
+	f1: function(bs,f){
+		var s = new Point2();
+		Point2.copy(bs[0].p,s);
+		for (var i = bs.length - 1; i >= 1; i--) {
+			if(bs[i].p.x<s.x) s.x = bs[i].p.x;
+			if(bs[i].p.y<s.y) s.y = bs[i].p.y;
+		}
+		s.div(maxD);
+		s.floor();
+		var maxRadius = this.getMaxRadius(bs);
+		var maxD = maxRadius*2;
+		var all = this.all;
+		for (var i = bs.length - 1; i >= 0; i--) {
+			var b = bs[i];
+			var x = Math.floor(b.p.x/maxD)-s.x,
+				y = Math.floor(b.p.y/maxD)-s.y;
+			for(var py=y-1;py<=y+1;py++){
+				if(!all[py]) continue;
+				for(var px=x-1;px<=x+1;px++){
+					if(!all[py][px]) continue;
+					for (var j = all[py][px].length - 1; j >= 0; j--) {
+						var k = all[py][px][j];
+						var b2 = k.obj;
+						if(f) f(b,b2);
+					}
+				}
+			}
+		}
+	},
+	f1: function(bs,f,w,h){
+		var s = new Point2();
+		Point2.copy(bs[0].p,s);
+		for (var i = bs.length - 1; i >= 1; i--) {
+			if(bs[i].p.x<s.x) s.x = bs[i].p.x;
+			if(bs[i].p.y<s.y) s.y = bs[i].p.y;
+		}
+		s.div(maxD);
+		s.floor();
+		var maxRadius = this.getMaxRadius(bs);
+		var maxD = maxRadius*2;
+		var all = this.all;
+		for (var i = bs.length - 1; i >= 0; i--) {
+			var b = bs[i];
+			var x = Math.floor(b.p.x/maxD)-s.x,
+				y = Math.floor(b.p.y/maxD)-s.y;
+			for(var py=y-1;py<=y+1;py++){
+				if(!all[py]) continue;
+				for(var px=x-1;px<=x+1;px++){
+					if(!all[py][px]) continue;
+					for (var j = all[py][px].length - 1; j >= 0; j--) {
+						var k = all[py][px][j];
+						var b2 = k.obj;
+						if(f) f(b,b2);
 					}
 				}
 			}

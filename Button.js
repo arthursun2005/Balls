@@ -5,7 +5,7 @@ function Button(x,y,dx,dy,t,f){
 	this.t = t;
 	this.df = null;
 	this.f = f;
-	this.c = "#00DD00";
+	this.c = "#66DD00";
 	this.tc = "#000000";
 	this.s = Math.min(this.d.x,this.d.y)/2;
 	bw.push(this);
@@ -17,7 +17,7 @@ Button.prototype.draw = function() {
 	D.fillText(this.t,px,py+this.s/4,this.s+"px monospace",this.tc);
 };
 Button.prototype.in = function(x,y) {
-	return x>this.p.x-this.d.x && x<this.p.x+this.d.x && y>this.p.y-this.d.y && y<this.p.y+this.d.y;
+	return x>this.p.x-this.d.x/2 && x<this.p.x+this.d.x/2 && y>this.p.y-this.d.y/2 && y<this.p.y+this.d.y/2;
 };
 Button.prototype.run = function() {
 	if(this.df) this.df();
