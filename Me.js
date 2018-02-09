@@ -51,7 +51,7 @@ Me.prototype.cl1 = function(ball) {
 			ball.p.y+dy,
 			ball.r
 			)){
-			var energy = Point2.mag(ball.v)*Point2.mag(ball.v)*ball.m+Point2.mag(this.v)*Point2.mag(this.v)*20;
+			var energy = Math.pow(Point2.mag(ball.v)+Point2.mag(this.v),2)*ball.m;
 			return [true,energy];
 		}
 	}

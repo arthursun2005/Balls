@@ -30,6 +30,7 @@
 	</script>
 	<script src="Ball.js"></script>
 	<script src="Me.js"></script>
+	<script src="Objects.js"></script>
 	<script type="text/javascript">
 		var size = 1e4;
 		var startTime = Date.now();
@@ -73,7 +74,7 @@
 		var maxSpeed = 6;
 		var tDead = false, pDead = false;
 		var maxHealth = 1000;
-		var health = maxHealth;
+		var health = maxHealth, showHealth = maxHealth;
 		var healthColor;
 		function healthBar(){
 			var bit1 = decimalTo(Math.round((maxHealth-health)/1000*255/1.5),16);
@@ -86,7 +87,7 @@
 			for(var i=0;i<2-bit3.length;i++){bit3 = "0"+bit3;}
 			healthColor = "#"+bit1+bit2+bit3;
 
-			D.fillRect(MM.ww/4, 10, MM.ww/2*health/maxHealth, 25, healthColor);
+			D.fillRect(MM.ww/4, 10, MM.ww/2*showHealth/maxHealth, 25, healthColor);
 
 			var d = MM.c.getContext("2d");
 			d.beginPath();
@@ -95,7 +96,7 @@
 			d.rect(MM.ww/4, 10, MM.ww/2, 25);
 			d.stroke();
 
-			D.fillText(health+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#000000");
+			D.fillText(showHealth+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#000000");
 		}
 		function grid(sp){
 			var d = MM.c.getContext("2d");
@@ -124,10 +125,17 @@
 			if(sc != 0) return;
 			sc = 2;
 			sc0Balls = [];
-			for(var i=0;i<1000;i++){
-				var b = new Ball(random(-size,size),random(-size,size),random(50,220));
-				b.v = new Point2(random(-2,2),random(-2,2));
-				if(Point2.mag(Point2.sub(b.p,me.p))>500) mainBalls.push(b);
+			for(var i=0;i<800;i++){
+				if(Math.random()<1/2){
+					var b = new Ball(random(-size,size),random(-size,size),random(30,50));
+					b.v = new Point2(random(-2,2),random(-2,2));
+					if(Point2.mag(Point2.sub(b.p,me.p))>1000) mainBalls.push(b);
+				}else{
+					var b = new Ball(random(-size,size),random(-size,size),random(150,300));
+					b.v = new Point2(random(-2,2),random(-2,2));
+					if(Point2.mag(Point2.sub(b.p,me.p))>1000) mainBalls.push(b);
+				}
+				
 			}
 		});
 		var sc2Butts = [
@@ -144,7 +152,7 @@
 		];
 		for(var i=0;i<6;i++){
 			var b = new Ball(random(0,MM.ww),random(0,MM.hh),random(10,40));
-			b.v = new Point2(random(-1,1),random(-1,1));
+			b.v = new Point2(random(-1/2,1/2),random(-1/2,1/2));
 			sc0Balls.push(b);
 		}
 		function drawMiniMap(){
@@ -155,27 +163,54 @@
 			var d = MM.c.getContext("2d");
 			d.beginPath();
 			d.translate(10+ss/2+me.p.x*scl,10+ss/2+me.p.y*scl);
-			d.scale(scl,scl);
+			d.scale(1/10,1/10);
 			d.rotate(me.a);
 			d.rect(-me.d/2,-me.d/2,me.d,me.d);
 			d.rotate(-me.a);
-			d.scale(1/scl,1/scl);
+			d.scale(10,10);
 			d.translate(-(10+ss/2+me.p.x*scl),-(10+ss/2+me.p.y*scl));
 			d.strokeStyle = me.c;
-			d.lineWidth = 2.5*scl;
+			d.lineWidth = 2.5*1/10;
 			if(me.hit){
 				d.strokeStyle = "#FF0000";
-				d.lineWidth = 6*scl;
+				d.lineWidth = 6*1/10;
 			}
 			d.stroke();
 		}
-		var d1 = 0, dt1 = 40;
+		var d1 = 0, dt1 = 50;
 		var ox = false, oy = false;
+		var re1;
 		function run(){
 			if(Point2.mag(me.v)>maxSpeed){
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
 			}
-			dtime = startTime-Date.now();
+			dtime = Date.now()-startTime;
+			if(pDead){
+				tDead = false;
+				pDead = false;
+				sc = 0;
+			}
+			if(tDead){
+				var pt = 7000;
+				if(Date.now()-re1>pt) pDead = true;
+				var th = map(Date.now()-re1,0,pt,0,2*Math.PI);
+				D.fillRect(0,0,MM.ww,MM.hh,"#00000001");
+				var w = MM.ww/2, h = MM.hh/2;
+				D.rect(MM.ww/2-w/2,MM.hh/2-h/2,w,h,"#00000020","#FFFFFF");
+
+				var d = MM.c.getContext("2d");
+				d.beginPath();
+				d.strokeStyle = "#FFFFFF20";
+				d.lineWidth = 4;
+				d.arc(MM.ww/2,MM.hh/2-h/7,Math.min(w,h)/3.5,-Math.PI/2,th-Math.PI/2);
+				d.stroke();
+
+				health = maxHealth, showHealth = maxHealth;
+
+				D.fillText(Math.round((pt-Date.now()+re1)/1000),MM.ww/2,MM.hh/2-h/14,Math.min(w,h)/3.4+"px monospace","#FFFFFF");
+				setTimeout(run, 10);
+				return;
+			}
 			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF80");
 			if(sc == 0){
 				playButt.run();
@@ -188,24 +223,28 @@
 					sc0Balls[i].draw();
 				}
 				Balls.solve(sc0Balls);
-				if(d1 == 0 && sc0Balls.length<50){
-					var b = new Ball(-50,-50,random(15,36));
-					b.v = new Point2(random(1,2),random(1,2));
+				if(d1 == 0 && sc0Balls.length<32){
+					var b = new Ball(random(-50,MM.ww+50),-50,random(10,42));
+					b.v = new Point2(random(-1/2,1/2),random(1/2,3));
 					sc0Balls.push(b);
 				}
 				d1 = (d1+1)%dt1;
 			}else if(sc == 1){
+				if(health<=0){
+					tDead = true;
+					re1 = Date.now();
+				}
+				showHealth+=Math.round((health-showHealth)*0.05);
 				grid(50);
 				me.a+=0.04;
 				me.update();
 				me.draw();
 				me.v.mult(0.9);
-
 				var hit = 0;
 				for (var j = mainBalls.length - 1; j >= 0; j--) {
 					var m = me.cl1(mainBalls[j]);
 					if(m[0]){
-						health-=Math.round(m[1]/6000);
+						health-=Math.round(m[1]/size/2);
 						hit++;
 					}
 				}
