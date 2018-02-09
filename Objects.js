@@ -49,7 +49,23 @@ Text.prototype.float = function() {
 	this.v.x+=random(-0.1,0.1);
 	this.v.y+=random(-0.1,0.1);
 };
-function heart(x,y,s){
+function heart(x,y,s) {
+	// https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
+	var d = MM.c.getContext("2d");
+	d.beginPath();
+	d.translate(x-75,y-75);
+	d.scale(s,s);
+	d.moveTo(75, 40);
+	d.bezierCurveTo(75, 37, 70, 25, 50, 25);
+	d.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+	d.bezierCurveTo(20, 80, 40, 102, 75, 120);
+	d.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+	d.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+	d.bezierCurveTo(85, 25, 75, 37, 75, 40);
+	d.scale(1/s,1/s);
+	d.translate(-x+75,-y+75);
+	d.fillStyle = "#FF5060";
+	d.fill();
 }
 function Line(x1,y1,x2,y2){
 	this.p1 = new Point2(x1,y1);
