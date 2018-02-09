@@ -11,7 +11,9 @@ function Ball(x,y,r,m){
 	this.v = new Point2();
 	this.r = r;
 	this.m = m || this.r*this.r;
-	this.c = "#DD660010";
+	var t = ""+decimalTo(Math.round(random(100,255)),16);
+	console.log(t);
+	this.c = "#"+t+"990010";
 }
 Ball.prototype.solveLineSegment = function(p1,p2){
 };
@@ -64,6 +66,10 @@ Ball.prototype.each = function(other) {
 	var m = Point2.mag(d);
 	var a = Point2.heading(d);
 	if(m<this.r+other.r){
+		var l = this.r+other.r-m;
+		other.p.add(Point2.mult(n,l/2));
+		this.p.sub(Point2.mult(n,l/2));
+
 		var ptemp = [new Point2(),new Point2()];
 		var vtemp = [new Point2(),new Point2()];
 		var vfinal = [new Point2(),new Point2()];
@@ -105,6 +111,7 @@ var Balls = {
 	solve: function(bs){
 		var all = [], maxRadius = this.getMaxRadius(bs);
 		var maxD = maxRadius*2;
+		this.maxD = maxD;
 		if(bs.length<1) return;
 		var s = new Point2();
 		Point2.copy(bs[0].p,s);
@@ -114,6 +121,7 @@ var Balls = {
 		}
 		s.div(maxD);
 		s.floor();
+		this.minP = s;
 		for (var i = bs.length - 1; i >= 0; i--) {
 			var b = bs[i];
 			var x = Math.floor(b.p.x/maxD)-s.x,

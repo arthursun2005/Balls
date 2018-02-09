@@ -3,7 +3,7 @@ function Me(){
 	this.v = new Point2();
 	this.d = 48;
 	this.a = 0;
-	this.c = "#888800";
+	this.c = "#4488EE";
 	this.hit = false;
 }
 Me.prototype.draw = function() {

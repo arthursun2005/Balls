@@ -96,7 +96,7 @@
 			d.rect(MM.ww/4, 10, MM.ww/2, 25);
 			d.stroke();
 
-			D.fillText(showHealth+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#000000");
+			D.fillText(showHealth+"/"+maxHealth,MM.ww/2,25+25/4,"20px monospace", "#00000084");
 		}
 		function grid(sp){
 			var d = MM.c.getContext("2d");
@@ -125,9 +125,9 @@
 			if(sc != 0) return;
 			sc = 2;
 			sc0Balls = [];
-			for(var i=0;i<800;i++){
-				if(Math.random()<1/2){
-					var b = new Ball(random(-size,size),random(-size,size),random(30,50));
+			for(var i=0;i<900;i++){
+				if(Math.random()<3/4){
+					var b = new Ball(random(-size,size),random(-size,size),random(40,70));
 					b.v = new Point2(random(-2,2),random(-2,2));
 					if(Point2.mag(Point2.sub(b.p,me.p))>1000) mainBalls.push(b);
 				}else{
@@ -188,6 +188,10 @@
 		var d1 = 0, dt1 = 50;
 		var ox = false, oy = false;
 		var re1;
+		var massages = [];
+		var t = new Text(-100,-1000,":) You may want to go this way -->");
+		t.s = 75;
+		massages.push(t);
 		function run(){
 			if(Point2.mag(me.v)>maxSpeed){
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
@@ -205,6 +209,7 @@
 			}
 			if(tDead){
 				health = 0;
+				console.log(health);
 				healthBar();
 				var pt = 7000;
 				if(Date.now()-re1>pt) pDead = true;
@@ -247,6 +252,9 @@
 				}
 				d1 = (d1+1)%dt1;
 			}else if(sc == 1){
+				for (var i = massages.length - 1; i >= 0; i--) {
+					massages[i].draw();
+				}
 				if(health<=0){
 					tDead = true;
 					re1 = Date.now();
@@ -277,16 +285,26 @@
 					mainBalls[i].edge2();
 					mainBalls[i].update();
 				}
-				for (var i = mainBalls.length - 1; i >= 0; i--) {
-					mainBalls[i].draw();
+				var y1 = Math.round(-MM.my/Balls.maxD)-Balls.minP.y-2;
+				var y2 = Math.round((-MM.my+MM.hh)/Balls.maxD)-Balls.minP.y+2;
+				var x1 = Math.round(-MM.mx/Balls.maxD)-Balls.minP.x-2;
+				var x2 = Math.round((-MM.mx+MM.ww)/Balls.maxD)-Balls.minP.x+2;
+				for (var y=y1;y<=y2;y++){
+					if(!Balls.all[y]) continue;
+					for (var x=x1;x<=x2;x++){
+						if(!Balls.all[y][x]) continue;
+						for (var i = Balls.all[y][x].length - 1; i >= 0; i--) {
+							Balls.all[y][x][i].obj.draw();
+						}
+					}
 				}
 				if(contT){
 					if(Date.now()-contT<3000){
-						var t = Math.round(Math.sin(Date.now()-contT)*50);
+						var t = decimalTo(Math.round(Math.sin((Date.now()-contT)/50)*255),16);
 						if(t.length<1) t = "0"+t;
 						me.c = "#"+t+"0000";
 					}else{
-						me.c = "#888800";
+						me.c = "#4488EE";
 					}
 				}
 				healthBar();
