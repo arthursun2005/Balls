@@ -104,7 +104,7 @@
 				if(xy+MM.mx<MM.ww && xy+MM.mx>0){
 					d.beginPath();
 					d.lineWidth = 1;
-					d.strokeStyle = "#00000011";
+					d.strokeStyle = "#00000066";
 					d.moveTo(xy+MM.mx, -size+MM.my);
 					d.lineTo(xy+MM.mx, size+MM.my);
 					d.stroke();
@@ -112,7 +112,7 @@
 				if(xy+MM.my<MM.hh && xy+MM.my>0){
 					d.beginPath();
 					d.lineWidth = 1;
-					d.strokeStyle = "#00000011";
+					d.strokeStyle = "#00000066";
 					d.moveTo(-size+MM.mx, xy+MM.my);
 					d.lineTo(size+MM.mx, xy+MM.my);
 					d.stroke();
@@ -190,8 +190,50 @@
 		var re1;
 		var massages = [];
 		var t = new Text(-100,-1000,":) You may want to go this way -->");
-		t.s = 75;
+		t.s = 45;
 		massages.push(t);
+
+		var t = new Text(MM.ww/2,-100,"Hello!");
+		t.s = 155;
+		massages.push(t);
+
+		var t = new Text(0,MM.hh+100,"The right statement is false \n\n The left statement is true");
+		t.c = "#FF00FF";
+		t.s = 25;
+		massages.push(t);
+
+		for(var i=0;i<30;i++){
+			var t = new Text(random(-size,size),random(-size,size),"Go that way ->");
+			t.s = 55;
+			t.floating = false;
+			massages.push(t);
+		}
+
+		for(var i=0;i<30;i++){
+			var t = new Text(random(-size,size),random(-size,size),"Go this way <-");
+			t.s = 55;
+			t.floating = false;
+			massages.push(t);
+		}
+
+		for(var i=0;i<10;i++){
+			var t = new Text(random(-size,size),random(-size,size),"1+1 = 3");
+			t.s = 165;
+			t.floating = false;
+			massages.push(t);
+		}
+		for(var i=0;i<20;i++){
+			var t = new Text(random(-size,size),random(-size,size),">_");
+			t.s = 135;
+			t.floating = true;
+			massages.push(t);
+		}
+		for(var i=0;i<20;i++){
+			var t = new Text(random(-size,size),random(-size,size),"∞");
+			t.s = 200;
+			t.floating = true;
+			massages.push(t);
+		}
 		function run(){
 			if(Point2.mag(me.v)>maxSpeed){
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
@@ -233,7 +275,7 @@
 				return;
 			}
 			grid(50);
-			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF80");
+			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFFD3");
 			if(sc == 0){
 				playButt.run();
 				D.strokeText("Balls!", MM.ww/2,MM.hh/4,Math.min(MM.ww,MM.hh)/4+"px monospace","#0000FF");
@@ -302,7 +344,7 @@
 					if(Date.now()-contT<3000){
 						var t = decimalTo(Math.round(Math.sin((Date.now()-contT)/50)*255),16);
 						if(t.length<1) t = "0"+t;
-						me.c = "#"+t+"0000";
+						me.c = "#"+t+"00"+t;
 					}else{
 						me.c = "#4488EE";
 					}
