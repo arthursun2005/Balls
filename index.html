@@ -71,15 +71,15 @@
 			var x = e.keyCode;
 			keys[x] = false;
 		}
-		var maxSpeed = 6;
+		var maxSpeed = 7.5;
 		var tDead = false, pDead = false;
-		var maxHealth = 1000;
+		var maxHealth = 1000000;
 		var health = maxHealth, showHealth = maxHealth;
 		var healthColor;
 		function healthBar(){
-			var bit1 = decimalTo(Math.round((maxHealth-health)/1000*255/1.5),16);
-			var bit2 = decimalTo(Math.round(health/1000*255),16);
-			var bit3 = decimalTo(Math.round(health/1000*255/5),16);
+			var bit1 = decimalTo(Math.round((maxHealth-health)/maxHealth*255/1.5),16);
+			var bit2 = decimalTo(Math.round(health/maxHealth*255),16);
+			var bit3 = decimalTo(Math.round(health/maxHealth*255/5),16);
 			for(var i=0;i<2-bit1.length;i++){bit1 = "0"+bit1;}
 			if(bit1.length<2){bit1 = "0"+bit1;}
 
@@ -138,6 +138,14 @@
 				
 			}
 		});
+		var contT;
+		var contButt = new Button(MM.ww/2,MM.hh/2+MM.hh/6,MM.ww/5,MM.hh/12,"Continue",function(){
+				if(sc != 1 || !tDead) return;
+				tDead = false;
+				health = Math.round(maxHealth/2.7);
+				contT = Date.now();
+		});
+		contButt.c = "#66666605";
 		var sc2Butts = [
 			new Button(MM.ww/4,MM.hh/2,MM.ww/3.5,MM.hh/4,"Keys",function(){
 				if(sc != 2) return;
@@ -185,32 +193,41 @@
 				me.v = Point2.mult(Point2.normalize(me.v),maxSpeed);
 			}
 			dtime = Date.now()-startTime;
+			showHealth+=Math.round((health-showHealth)*0.2);
 			if(pDead){
 				tDead = false;
 				pDead = false;
+				mainBalls = [];
 				sc = 0;
+				health = maxHealth, showHealth = maxHealth;
+				MM.mx = 0, MM.my = 0;
+				me.p.x = 0, me.p.y = 0;
 			}
 			if(tDead){
+				health = 0;
+				healthBar();
 				var pt = 7000;
 				if(Date.now()-re1>pt) pDead = true;
 				var th = map(Date.now()-re1,0,pt,0,2*Math.PI);
 				D.fillRect(0,0,MM.ww,MM.hh,"#00000001");
 				var w = MM.ww/2, h = MM.hh/2;
-				D.rect(MM.ww/2-w/2,MM.hh/2-h/2,w,h,"#00000020","#FFFFFF");
+				D.rect(MM.ww/2-w/2,MM.hh/2-h/2,w,h,"#00000002","#FFFFFF");
 
 				var d = MM.c.getContext("2d");
 				d.beginPath();
 				d.strokeStyle = "#FFFFFF20";
-				d.lineWidth = 4;
+				d.lineWidth = 12;
 				d.arc(MM.ww/2,MM.hh/2-h/7,Math.min(w,h)/3.5,-Math.PI/2,th-Math.PI/2);
 				d.stroke();
 
-				health = maxHealth, showHealth = maxHealth;
+				D.fillText(Math.round((pt-Date.now()+re1)/1000),MM.ww/2,MM.hh/2-h/14,Math.min(w,h)/3.4+"px monospace","#FFFFFF08");
 
-				D.fillText(Math.round((pt-Date.now()+re1)/1000),MM.ww/2,MM.hh/2-h/14,Math.min(w,h)/3.4+"px monospace","#FFFFFF");
+				contButt.run();
+
 				setTimeout(run, 10);
 				return;
 			}
+			grid(50);
 			D.fillRect(0,0,MM.ww,MM.hh,"#FFFFFF80");
 			if(sc == 0){
 				playButt.run();
@@ -234,17 +251,21 @@
 					tDead = true;
 					re1 = Date.now();
 				}
-				showHealth+=Math.round((health-showHealth)*0.05);
-				grid(50);
+				health+=(maxHealth-health)*0.0001;
 				me.a+=0.04;
 				me.update();
 				me.draw();
 				me.v.mult(0.9);
 				var hit = 0;
 				for (var j = mainBalls.length - 1; j >= 0; j--) {
+					if(contT){
+						if(Date.now()-contT<3000){
+							break;
+						}
+					}
 					var m = me.cl1(mainBalls[j]);
 					if(m[0]){
-						health-=Math.round(m[1]/size/2);
+						health-=Math.round(Math.pow(m[1],1/2.5)*100);
 						hit++;
 					}
 				}
@@ -259,8 +280,17 @@
 				for (var i = mainBalls.length - 1; i >= 0; i--) {
 					mainBalls[i].draw();
 				}
+				if(contT){
+					if(Date.now()-contT<3000){
+						var t = Math.round(Math.sin(Date.now()-contT)*50);
+						if(t.length<1) t = "0"+t;
+						me.c = "#"+t+"0000";
+					}else{
+						me.c = "#888800";
+					}
+				}
 				healthBar();
-				var sp = 1/3;
+				var sp = 2/5;
 				if(controls1 == "keys"){
 					if(keys[37]){
 						me.v.x-=sp;
