@@ -10,10 +10,10 @@ function Ball(x,y,r,m){
 	this.p = new Point2(x,y);
 	this.v = new Point2();
 	this.r = r;
-	this.m = m || this.r*this.r;
+	this.m = m || this.r*this.r*this.r;
 	var t = ""+decimalTo(Math.round(random(100,255)),16);
-	console.log(t);
 	this.c = "#"+t+"990010";
+	this.gone = false;
 }
 Ball.prototype.solveLineSegment = function(p1,p2){
 };

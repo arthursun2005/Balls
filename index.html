@@ -20,6 +20,7 @@
 		const MM = {
 			c: document.getElementById('main')
 		};
+		const G = 6.77e-11;
 		const D = new Draw(MM.c);
 		function init(){
 			MM.c.width = window.innerWidth, MM.c.height = window.innerHeight;
@@ -32,6 +33,7 @@
 	<script src="Me.js"></script>
 	<script src="Objects.js"></script>
 	<script type="text/javascript">
+		var immortal = true;
 		var size = 1e4;
 		var startTime = Date.now();
 		var dtime;
@@ -41,6 +43,14 @@
 		var me = new Me();
 		me.p = new Point2(MM.ww/2,MM.hh/2);
 		var last = new Point2();
+		var maxSpeed = 7.5;
+		var tDead = false, pDead = false;
+		var maxHealth = 1500000;
+		var health = maxHealth, showHealth = maxHealth;
+		var healthColor;
+		var sc0Balls = [];
+		var mainBalls = [];
+		var mainBlackHoles = [];
 		function rm(event){
 			var e = event || window.event;
 			var mouseX = e.offsetX, mouseY = e.offsetY;
@@ -71,11 +81,6 @@
 			var x = e.keyCode;
 			keys[x] = false;
 		}
-		var maxSpeed = 7.5;
-		var tDead = false, pDead = false;
-		var maxHealth = 1000000;
-		var health = maxHealth, showHealth = maxHealth;
-		var healthColor;
 		function healthBar(){
 			var bit1 = decimalTo(Math.round((maxHealth-health)/maxHealth*255/1.5),16);
 			var bit2 = decimalTo(Math.round(health/maxHealth*255),16);
@@ -119,8 +124,16 @@
 				}
 			}
 		}
-		var sc0Balls = [];
-		var mainBalls = [];
+		var b = new BlackHole(-size/2,-size/2,50);
+		mainBlackHoles.push(b);
+		var b = new BlackHole(0,-size/2,20);
+		mainBlackHoles.push(b);
+		var b = new BlackHole(-size/2,size/2,10);
+		mainBlackHoles.push(b);
+		var b = new BlackHole(size/2,size/2,10);
+		mainBlackHoles.push(b);
+		var b = new BlackHole(size/6*5,-size/2,80);
+		mainBlackHoles.push(b);
 		var playButt = new Button(MM.ww/2,MM.hh/4*3,MM.ww/3,MM.hh/5,"Play!",function(){
 			if(sc != 0) return;
 			sc = 2;
@@ -171,19 +184,19 @@
 			var d = MM.c.getContext("2d");
 			d.beginPath();
 			d.translate(10+ss/2+me.p.x*scl,10+ss/2+me.p.y*scl);
-			d.scale(1/10,1/10);
-			d.rotate(me.a);
-			d.rect(-me.d/2,-me.d/2,me.d,me.d);
-			d.rotate(-me.a);
-			d.scale(10,10);
+			//d.scale(1/10,1/10);
+			//d.rotate(me.a);
+			//d.rect(-me.d/2,-me.d/2,me.d,me.d);
+			d.arc(0,0,2,0,2*Math.PI)
+			//d.rotate(-me.a);
+			//d.scale(10,10);
 			d.translate(-(10+ss/2+me.p.x*scl),-(10+ss/2+me.p.y*scl));
-			d.strokeStyle = me.c;
-			d.lineWidth = 2.5*1/10;
+			d.fillStyle = me.c;
 			if(me.hit){
-				d.strokeStyle = "#FF0000";
-				d.lineWidth = 6*1/10;
+				d.fillStyle = "#FF0000";
 			}
-			d.stroke();
+			d.fill();
+			//d.stroke();
 		}
 		var d1 = 0, dt1 = 50;
 		var ox = false, oy = false;
@@ -251,7 +264,6 @@
 			}
 			if(tDead){
 				health = 0;
-				console.log(health);
 				healthBar();
 				var pt = 7000;
 				if(Date.now()-re1>pt) pDead = true;
@@ -279,6 +291,11 @@
 			if(sc == 0){
 				playButt.run();
 				D.strokeText("Balls!", MM.ww/2,MM.hh/4,Math.min(MM.ww,MM.hh)/4+"px monospace","#0000FF");
+				for (var i = sc0Balls.length - 1; i >= 0; i--) {
+					if(sc0Balls[i].gone){
+						sc0Balls.splice(i,1);
+					}
+				}
 				for (var i = sc0Balls.length - 1; i >= 0; i--) {
 					sc0Balls[i].edge();
 					sc0Balls[i].update();
@@ -313,6 +330,7 @@
 							break;
 						}
 					}
+					if(immortal) break;
 					var m = me.cl1(mainBalls[j]);
 					if(m[0]){
 						health-=Math.round(Math.pow(m[1],1/2.5)*100);
@@ -321,7 +339,11 @@
 				}
 				if(hit<=0){me.hit = false;}
 				else{me.hit = true;}
-
+				for (var i = mainBalls.length - 1; i >= 0; i--) {
+					if(mainBalls[i].gone){
+						mainBalls.splice(i,1);
+					}
+				}
 				Balls.solve(mainBalls);
 				for (var i = mainBalls.length - 1; i >= 0; i--) {
 					mainBalls[i].edge2();
@@ -349,8 +371,15 @@
 						me.c = "#4488EE";
 					}
 				}
+				for (var i = mainBlackHoles.length - 1; i >= 0; i--) {
+					mainBlackHoles[i].run();
+				}
+				for (var i = mainBlackHoles.length - 1; i >= 0; i--) {
+					mainBlackHoles[i].solveBalls(mainBalls);
+					mainBlackHoles[i].solveMe();
+				}
 				healthBar();
-				var sp = 2/5;
+				var sp = 2/3;
 				if(controls1 == "keys"){
 					if(keys[37]){
 						me.v.x-=sp;

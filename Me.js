@@ -5,6 +5,7 @@ function Me(){
 	this.a = 0;
 	this.c = "#4488EE";
 	this.hit = false;
+	this.m = this.d*this.d*this.d;
 }
 Me.prototype.draw = function() {
 	var d = MM.c.getContext("2d");

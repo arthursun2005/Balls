@@ -67,7 +67,76 @@ function heart(x,y,s) {
 	d.fillStyle = "#FF5060";
 	d.fill();
 }
+function BlackHole(x,y,r){
+	this.p = new Point2(x,y);
+	this.v = new Point2();
+	this.r = r;
+	this.k = 6e8;
+	this.m = this.r*this.r*this.r*this.k;
+}
+BlackHole.prototype.draw = function() {
+	var d = MM.c.getContext("2d");
+	d.beginPath();
+	d.translate(this.p.x+MM.mx,this.p.y+MM.my);
+	d.strokeStyle = "#FFFF00";
+	d.fillStyle = "#000000";
+	d.lineWidth = 4;
+	d.arc(0,0,this.r,0,2*Math.PI);
+	d.translate(-this.p.x-MM.mx,-this.p.y-MM.my);
+	d.stroke();
+	d.fill();
+};
+BlackHole.prototype.solveMe = function() {
+	var d = Point2.sub(me.p,this.p);
+	var m = Point2.mag(d);
+	var n = Point2.normalize(d);
+	if(m>10 && !(contT && Date.now()-contT<3000)){
+		this.v.add(Point2.mult(n,me.m/m/m*G*8));
+		me.v.sub(Point2.mult(n,this.m/m/m*G*8));
+	}
+	if(m<this.r/2 && !(contT && Date.now()-contT<3000)){
+		tDead = true;
+		re1 = Date.now();
+	}
+};
+BlackHole.prototype.solveBalls = function(balls) {
+	for (var i = balls.length - 1; i >= 0; i--) {
+		var d = Point2.sub(balls[i].p,this.p);
+		var m = Point2.mag(d);
+		var n = Point2.normalize(d);
+		this.v.add(Point2.mult(n,balls[i].m/m/m*G));
+		balls[i].v.sub(Point2.mult(n,this.m/m/m*G));
+
+		if(m<this.r+balls[i].r){
+			if(balls[i].r<this.r || balls[i].r<30){
+				this.m+=balls[i].m/10;
+				this.r = Math.pow(this.m/this.k,1/3);
+				balls[i].gone = true;
+			}else{
+				var b = balls[i];
+				var nr = Math.pow(b.m/4,1/3);
+				var x,y;
+				var a = random(0,2*Math.PI);
+				x = Math.cos(a)*nr+b.p.x, y = Math.sin(a)*nr+b.p.y;
+				var b2 = new Ball(x,y,nr);
+				b.r = nr;
+				Point2.copy(b.v,b2.v);
+
+				b.v.add(Point2.mult(n,this.r/8));
+				b2.v.add(Point2.mult(n,this.r/8));
+
+				mainBalls.push(b2);
+			}
+		}
+	}
+}
+BlackHole.prototype.run = function() {
+	this.p.add(this.v);
+	this.draw();
+};
 function Line(x1,y1,x2,y2){
 	this.p1 = new Point2(x1,y1);
 	this.p2 = new Point2(x2,y2);
 }
+Line.prototype.draw = function() {
+};
