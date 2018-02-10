@@ -14,6 +14,7 @@ function Ball(x,y,r,m){
 	var t = ""+decimalTo(Math.round(random(100,255)),16);
 	this.c = "#"+t+"990010";
 	this.gone = false;
+	this.maxSpeed = 6;
 }
 Ball.prototype.solveLineSegment = function(p1,p2){
 };
@@ -30,6 +31,9 @@ Ball.prototype.draw = function() {
 	d.fill();
 };
 Ball.prototype.update = function() {
+	if(Point2.mag(this.v)>this.maxSpeed){
+		this.v = Point2.mult(Point2.normalize(this.v),this.maxSpeed);
+	}
 	this.p.add(this.v);
 };
 Ball.prototype.edge = function() {

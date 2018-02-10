@@ -33,7 +33,7 @@
 	<script src="Me.js"></script>
 	<script src="Objects.js"></script>
 	<script type="text/javascript">
-		var immortal = true;
+		var immortal = false;
 		var size = 1e4;
 		var startTime = Date.now();
 		var dtime;
@@ -138,7 +138,7 @@
 			if(sc != 0) return;
 			sc = 2;
 			sc0Balls = [];
-			for(var i=0;i<900;i++){
+			for(var i=0;i<777;i++){
 				if(Math.random()<3/4){
 					var b = new Ball(random(-size,size),random(-size,size),random(40,70));
 					b.v = new Point2(random(-2,2),random(-2,2));

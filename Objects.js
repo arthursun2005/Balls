@@ -108,7 +108,7 @@ BlackHole.prototype.solveBalls = function(balls) {
 		balls[i].v.sub(Point2.mult(n,this.m/m/m*G));
 
 		if(m<this.r+balls[i].r){
-			if(balls[i].r<this.r || balls[i].r<30){
+			if(balls[i].r<this.r || balls[i].r<30 || mainBalls.length>1000){
 				this.m+=balls[i].m/10;
 				this.r = Math.pow(this.m/this.k,1/3);
 				balls[i].gone = true;
@@ -122,8 +122,8 @@ BlackHole.prototype.solveBalls = function(balls) {
 				b.r = nr;
 				Point2.copy(b.v,b2.v);
 
-				b.v.add(Point2.mult(n,this.r/8));
-				b2.v.add(Point2.mult(n,this.r/8));
+				b.v.add(n);
+				b2.v.add(n);
 
 				mainBalls.push(b2);
 			}
